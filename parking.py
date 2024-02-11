@@ -1,5 +1,6 @@
 import heapdict
 from abc import abstractmethod, ABC
+import datetime
 
 class Slot:
 
@@ -11,6 +12,10 @@ class Slot:
     def addCar(self, vehicle):
         self.isEmpty = False
         self.vehicle = vehicle
+    
+    def empty(self):
+        self.isEmpty = False
+        self.vehicle = None
  
 class ParkingAlgo():
     def __init__(self, slotQunatities) -> None:
@@ -29,6 +34,10 @@ class ParkingAlgo():
         fs = self.h.popitem()
         print(list(self.h.values()))
         return fs[0]
+
+
+        
+
 
 
 class Parking:
@@ -54,38 +63,72 @@ class Parking:
             print("assign diffrent slot")
         
         curSlot.addCar(car)
-        car.getParked(curSlot)
+        car.setTime()
         self.carCount += 1
+    
+    def removeVehicle(self, slotNumber): 
+        VehicleSlot = self.algo.slots[slotNumber]
+        vehicle = VehicleSlot.vehicle
+        VehicleSlot.empty()
+        parkedTime = vehicle.getParkedTime()
+        cost = vehicle.CalculatePayment(parkedTime)
+        print("please pay " + str(cost)+ "rs")
+    
+        
 
 
 
-class Vehicle():
+
+class Vehicle(ABC):
     def __init__(self, number, color) -> None:
         self.number = number
         self.color = color
         self.isParked = False
-        self.slot = None
         self.time = 0
     
-    def getSlot(self):
-        return self.slot.no
 
     def setTime(self):
         self.time = 1
     
-    def getParkerTime(self):
-        pass
+    def getParkedTime(self):
+        return 4 - self.time
+
+    @abstractmethod
+    def CalculatePayment(self, hours):
+        ...
+    
+
+
 
 
 class Car(Vehicle):
 
     def __init__(self, number, color) -> None:
         super().__init__(number, color)
+        self.payment  = CarPayment()
     
-    def getParked(self, slot):
-        self.slot = slot
-        self.isParked = True
-        print("car got Parked at slot "+ str(self.slot.no))
+    def CalculatePayment(self, hours):
+        return self.payment.calculateCost(hours)
+
+
+
+class Payment():
+
+    def __init__(self):
+        self.totalCost = 0
+    
+    def calculateCost(self, hours):
+        pass
+
+class CarPayment(Payment):
+    def __init__(self):
+        super().__init__()
+    
+    def calculateCost(self, hours):
+        return hours * 10
+    
+
+    
 
 
 
@@ -96,6 +139,7 @@ car2 = Car("tn07dc2550", "black")
 
 p1.parkCar(car1)
 p1.parkCar(car2)
-print(car2.getSlot())
+
+p1.removeVehicle(1)
 
 
